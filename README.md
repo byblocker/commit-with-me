@@ -35,6 +35,38 @@ Not every request requires this granularity. Say "Add this to the current commit
 
 Regardless, the agent never commits for you, and every change remains in your working tree until you commit.
 
+## Example handoff
+
+Given "Add a command that stores credentials in the system keyring", the agent plans four commits and presents each one like this:
+
+> ### Proposed commit
+>
+> `Add an example handoff to the README`
+>
+> **Summary**
+>
+> Adds an "Example handoff" section after Usage. It shows a filled-in proposal for the second commit of the keyring example from `SKILL.md`, so readers can see what a checkpoint looks like before they install the skill.
+>
+> **Validation steps**
+>
+> 1. Open `README.md` in a Markdown preview or on GitHub after pushing. **Expected:** "Example handoff" appears between Usage and License.
+>
+> **Files**
+>
+> - `README.md`
+>
+> **Checks**
+>
+> - **Not run:** Markdown lint. The repo has no linter or pre-commit config, and `markdownlint` isn't installed.
+>
+> **Known issues**
+>
+> The example omits Validation steps, which is how the skill treats a backend-only change. If you'd rather the example show every section, I can add them.
+>
+> **Diff**
+>
+> `git diff README.md`
+
 ## License
 
 [MIT](LICENSE)
