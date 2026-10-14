@@ -1,25 +1,25 @@
 ---
 name: commit-with-me
-description: Implement Git changes in small commits for human review. Use for code changes or commit preparation, excluding read-only and planning-only tasks. Leave proposals unstaged and wait for the user to commit. Honor opt-outs.
+description: Implement Git changes in small commits for human review. Use for code changes or commit preparation, not read-only or planning tasks. Leave proposals unstaged and wait for the user to commit.
 ---
 
 # Commit With Me
 
-Implement and validate one small commit at a time. Leave changes unstaged for the user to review, edit, stage, and commit. Begin the next commit only after inspecting the user's commit. Verbal approval alone does not complete the checkpoint.
+Implement and validate one small commit at a time. Leave changes unstaged for the user to review, edit, stage, and commit. Inspect their commit before starting the next.
 
 Explain this workflow briefly the first time it applies in a conversation.
 
 ## Before starting
 
-1. Check Git state with `git status` and `git log --oneline -5`. Note the branch, recent commits, and any staged, unstaged, or untracked changes. If the directory is not a Git repository, say so and ask how to proceed.
+1. Check Git state with `git status` and `git log --oneline -5`. If the directory is not a Git repository, say so and ask how to proceed.
 2. If a merge, rebase, cherry-pick, or bisect is in progress, or HEAD is detached, report it. Pause if it blocks the task, unless the user already authorized resolving it.
-3. Treat existing changes as the user's. Do not modify, stage, or unstage them, and include them in a proposal only with explicit permission. If your edits would overlap them, ask first.
+3. Treat existing changes as the user's. Do not modify them. Include them in a proposal only with explicit permission. If your edits would overlap them, ask first.
 4. Read repository instructions, such as `CLAUDE.md`, `AGENTS.md`, or `CONTRIBUTING.md`, for commit conventions and required checks.
-5. Confirm scope from the request and any plan the user provides, then plan commits as described below. For tasks with many commits, track each commit as planned, proposed, or committed.
+5. Confirm scope from the request and any plan the user provides. For tasks with many commits, track each commit as planned, proposed, or committed.
 
 ## Choose small commit boundaries
 
-Each step is one commit. Break the task into the smallest commits that each make one coherent change and leave the build and existing behavior working. Most tasks need several commits. When unsure whether to split, split.
+Break the task into the smallest commits that each make one coherent change and leave the build and existing behavior working. When unsure whether to split, split.
 
 Before editing, list the planned commits as subject lines, then begin the first without waiting for approval.
 
@@ -27,7 +27,7 @@ Separate:
 
 - A refactor with no behavior change, from the change it prepares for
 - A move or rename, from edits to the moved code
-- A new dependency, from the code that first uses it
+- A new or upgraded dependency, from the code that first uses it
 - A schema, migration, or configuration change, from the code that reads it
 - A new building block (type, module, component), from the code that wires it in
 - Each user-facing entry point (command, endpoint, flag, page)
@@ -42,7 +42,7 @@ Keep together:
 
 If the subject cannot name the change without "and" or a list, split the commit. A shared feature or motivation, one commit depending on another, and an unfinished feature are not reasons to combine.
 
-Combine two commits only when the first alone would break the build, would fail required checks, would be undone by standard tooling, or would change behavior outside the intended change. Line count does not decide: a short diff can hold two commits, and a long generated or mechanical diff can be one.
+Combine two commits only when the first alone would break the build, would fail required checks, would be undone by standard tooling, or would change behavior outside the intended change. Line count does not decide.
 
 For example, the task "Add a command that stores credentials in the system keyring" is four commits:
 
@@ -51,52 +51,41 @@ For example, the task "Add a command that stores credentials in the system keyri
 3. Add the credential storage command
 4. Document the credential storage command
 
-Implement only the current commit. Do not build the whole feature first and divide it afterward. Exclude unrelated work.
+Implement only the current commit. Do not build the whole feature first and divide it afterward.
 
 ## Justify dependencies
 
-Add a package only when the standard library, existing dependencies, or a few lines of code cannot reasonably do the job. Convenience alone is not enough when an existing solution is straightforward.
+Add a package only when the standard library, existing dependencies, or a few lines of code cannot reasonably do the job.
 
-Adding or upgrading a dependency is its own commit unless the combine rule applies. In that commit's Summary, after the first sentence, state:
+In a dependency commit's **Summary**, after the first sentence, state:
 
 - The package and exact version, or the old and new versions for an upgrade
 - The capability it provides, or the reason to upgrade, and why existing options fall short
 - Notable tradeoffs: maintenance, license, compatibility, or transitive dependencies
 
-Keep this proportional: a sentence or two for a small, well-known package, more for a large or unfamiliar one.
+Scale detail to the package's size and familiarity.
 
 ## Implement and validate
 
-Leave proposals in the working tree. Do not stage or unstage anything unless the user asks. Staged work you did not make does not block your edits; list it in Known issues.
+Do not stage or unstage anything unless the user asks. Staged work you did not make does not block your edits.
 
 Before each handoff, in order:
 
-1. Recheck Git state. Treat any change you did not make as the user's, even in files you edited.
+1. Recheck Git state for new user changes, even in files you edited.
 2. Run the applicable formatting, lint, build, and test checks, and follow any user instructions about them. Limit auto-formatters to the proposal's files. Pre-commit hooks normally check only staged changes, so run them against the proposal's files instead, for example `pre-commit run --files <paths>`.
-3. Fix failures the proposal caused, then rerun the affected checks. A fix the commit needs to pass belongs in it; an unrelated improvement you notice does not, so plan it as its own commit. Ask when a fix needs broader scope, a product decision, or more authorization.
-4. Never weaken tests, suppress valid diagnostics, or disable checks to make them pass.
-5. Review the complete proposal, including new, deleted, and generated files. Remove unintended files you created; never delete the user's files. Flag any secrets in Known issues. Recheck the subject against the Separate list.
-6. Report failures unrelated to the proposal and checks you did not run. If a check passed only because of other uncommitted changes, say so.
-
-When a change needs manual review, such as UI changes or external integrations, fill in Validation steps with setup, concrete actions, and observable expected results. Separate what you verified from what the user still needs to test.
+3. Fix failures the proposal caused, then rerun the affected checks. A fix the commit needs to pass belongs in it; an unrelated improvement you notice does not, so plan it as its own commit. Ask when a fix needs broader scope, a product decision, or more authorization. Never weaken tests, suppress valid diagnostics, or disable checks.
+4. Review the complete proposal, including new, deleted, and generated files. Remove unintended files you created; never delete the user's files. Flag any secrets in **Known issues**. Recheck the subject against the **Separate** list.
+5. Report failures unrelated to the proposal. If a check passed only because of other uncommitted changes, say so.
 
 ## Write the commit subject
 
-Follow the repository's conventions, such as Conventional Commits or the style of recent `git log` subjects. Otherwise, write an imperative subject of 72 characters or fewer that starts with a specific verb and names what changes:
+Follow the repository's conventions, such as Conventional Commits or the style of recent `git log` subjects. Otherwise, write an imperative subject of 72 characters or fewer that starts with a specific verb and names what changes, such as "Reject expired password-reset tokens". Name the change, not the activity: "Return 404 for unknown account IDs", not "Update handlers".
 
-- Reject expired password-reset tokens
-- Store credentials in the system keyring
-- Add the credential storage command
-
-Name the change, not the activity: 
-- Write "Skip keyring tests when no keyring service is running", not "Fix tests". 
-- Write "Return 404 for unknown account IDs", not "Update handlers".
-
-Leave out the commit body unless the repository requires one or the user asks for it. Put review rationale in the handoff's Summary instead. Add code comments only where they help future maintainers, following user and repository preferences.
+Leave out the commit body unless the repository requires one or the user asks for it. Put review rationale in the handoff's **Summary** instead.
 
 ## Present the proposal
 
-Render the following Markdown structure without an enclosing code block. Add no opening status sentence, extra sections, or closing instruction. Omit Validation steps when unnecessary, and any Checks lines that do not apply.
+Render the following Markdown structure without an enclosing code block. Add no opening status sentence, extra sections, or closing instruction. Include **Validation steps** only for behavior automated checks cannot confirm, such as a UI change, an interactive CLI prompt, or a call to a third-party API. In them, separate what you verified from what the user still needs to test. Omit **Checks** lines that do not apply.
 
 ### Proposed commit
 
@@ -104,7 +93,7 @@ Render the following Markdown structure without an enclosing code block. Add no 
 
 **Summary**
 
-<What this commit does and why; include package justification when applicable.>
+<What this commit does and why.>
 
 **Validation steps**
 
@@ -132,13 +121,13 @@ Setup: <requirements; omit if unnecessary>
 
 ---
 
-Prefer review links or commands over printing full diffs. Account for untracked files, which plain `git diff` omits, and distinguish the proposal from unrelated work. If a full diff is requested, use a fenced `diff` block.
+Account for untracked files, which plain `git diff` omits, and exclude unrelated changes, for example `git diff -- <paths>`. Print a full diff only on request, in a fenced `diff` block.
 
 ## Wait and resume
 
-After the handoff, stop. Do not poll for the commit or start the next one. Explain the workflow again only when asked.
+After the handoff, stop. Do not poll for the commit or start the next one.
 
-While waiting, answer questions and revise the proposal on request, then rerun affected checks and present the updated handoff.
+While waiting, answer questions and revise the proposal on request, then present the updated handoff.
 
 When the user returns, check `git status` and recent history:
 
@@ -157,4 +146,4 @@ If the user asks to skip checkpoints, such as "don't stop for each commit" or "m
 
 Skipping a single checkpoint applies only to that one. Note which changes belonged to it so they can still be committed separately.
 
-When scope changes, acknowledge it and update the commit plan. At completion, report what was done, what was not validated, and anything uncommitted or deferred. Delete only temporary files you created.
+When scope changes, acknowledge it and update the commit plan. At completion, report what was done, what was not validated, and anything uncommitted or deferred.
