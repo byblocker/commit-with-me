@@ -15,13 +15,13 @@ Explain this workflow briefly the first time it applies in a conversation.
 2. If a merge, rebase, cherry-pick, or bisect is in progress, or HEAD is detached, report it. Pause if it blocks the task, unless the user already authorized resolving it.
 3. Treat existing changes as the user's. Do not modify them. Include them in a proposal only with explicit permission. If your edits would overlap them, ask first.
 4. Read repository instructions, such as `CLAUDE.md`, `AGENTS.md`, or `CONTRIBUTING.md`, for commit conventions and required checks.
-5. Confirm scope from the request and any plan the user provides. For tasks with many commits, track each commit as planned, proposed, or committed.
+5. Confirm scope from the request and any plan the user provides.
 
 ## Choose small commit boundaries
 
-Break the task into the smallest commits that each make one coherent change and leave the build and existing behavior working. When unsure whether to split, split.
+Divide the request into tasks: features, fixes, or other units of work, each named in a few words. Break each task into the smallest commits that each make one coherent change and leave the build and existing behavior working. When unsure whether to split, split.
 
-Before editing, list the planned commits as subject lines, then begin the first without waiting for approval.
+Before editing, show the commit plan (see **Track progress**), then begin the first commit without waiting for approval.
 
 Separate:
 
@@ -52,6 +52,14 @@ For example, the task "Add a command that stores credentials in the system keyri
 4. Document the credential storage command
 
 Implement only the current commit. Do not build the whole feature first and divide it afterward.
+
+## Track progress
+
+The plan lists each task by name with its planned commits as subject lines. Show it once, before editing. After that, do not repeat it; each handoff's **What's next** section shows where the work stands.
+
+When the user makes a task's last commit, review the task before starting the next one: list its commits from `git log` with short hashes and summarize what the task delivered.
+
+If the request needs only one commit, skip the plan and **What's next**.
 
 ## Justify dependencies
 
@@ -115,6 +123,10 @@ Setup: <requirements; omit if unnecessary>
 
 <Limitations, decisions needed, or unrelated staged work; otherwise None.>
 
+**What's next**
+
+`<next commit's subject>` (<continues or starts> <task name>), or "None" if this is the request's last commit.
+
 **Diff**
 
 <Review link or exact inspection commands covering the complete proposal.>
@@ -136,7 +148,7 @@ When the user returns, check `git status` and recent history:
 - If they committed only part, propose the rest next unless they deferred it.
 - Rerun checks on anything changed since you last validated it.
 
-Then continue with the next planned commit. Ask when intent is unclear.
+If a task is now complete, present its review. Then continue with the next planned commit. Ask when intent is unclear.
 
 Never push, amend, rebase, force-push, or rewrite history unless the user explicitly asks. Never bypass commit hooks.
 
@@ -146,4 +158,6 @@ If the user asks to skip checkpoints, such as "don't stop for each commit" or "m
 
 Skipping a single checkpoint applies only to that one. Note which changes belonged to it so they can still be committed separately.
 
-When scope changes, acknowledge it and update the commit plan. At completion, report what was done, what was not validated, and anything uncommitted or deferred.
+When scope changes, update the plan and say what changed in one line. At completion, present the review of the last task and report what was not validated and anything uncommitted or deferred. 
+
+For a task left uncommitted because checkpoints were skipped, summarize its changes and files instead of listing commits.
