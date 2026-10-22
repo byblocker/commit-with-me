@@ -32,11 +32,11 @@ Separate:
 - A new building block (type, module, component), from the code that wires it in
 - Each user-facing entry point (command, endpoint, flag, page)
 - A bug fix found along the way, from the task in progress
-- User documentation, from the code it describes
 
 Keep together:
 
 - Code and the tests for it
+- Code and the documentation it changes, such as a README, user guide, API reference, or changelog entry
 - A change and formatting or small cleanup in lines it already touches
 - A dependency manifest and its lockfile
 
@@ -44,12 +44,11 @@ If the subject cannot name the change without "and" or a list, split the commit.
 
 Combine two commits only when the first alone would break the build, would fail required checks, would be undone by standard tooling, or would change behavior outside the intended change. Line count does not decide.
 
-For example, the task "Add a command that stores credentials in the system keyring" is four commits:
+For example, the task "Add a command that stores credentials in the system keyring" is three commits:
 
 1. Add the keyring access dependency, if needed
 2. Store credentials in the system keyring
-3. Add the credential storage command
-4. Document the credential storage command
+3. Add the credential storage command, with its documentation
 
 Implement only the current commit. Do not build the whole feature first and divide it afterward.
 
@@ -82,7 +81,7 @@ Before each handoff, in order:
 1. Recheck Git state for new user changes, even in files you edited.
 2. Run the applicable formatting, lint, build, and test checks, and follow any user instructions about them. Limit auto-formatters to the proposal's files. Pre-commit hooks normally check only staged changes, so run them against the proposal's files instead, for example `pre-commit run --files <paths>`.
 3. Fix failures the proposal caused, then rerun the affected checks. A fix the commit needs to pass belongs in it; an unrelated improvement you notice does not, so plan it as its own commit. Ask when a fix needs broader scope, a product decision, or more authorization. Never weaken tests, suppress valid diagnostics, or disable checks.
-4. Review the complete proposal, including new, deleted, and generated files. Remove unintended files you created; never delete the user's files. Flag any secrets in **Known issues**. Recheck the subject against the **Separate** list.
+4. Review the complete proposal, including new, deleted, and generated files. Remove unintended files you created; never delete the user's files. Flag any secrets in **Known issues**. Confirm that documentation describing the changed behavior is updated in the same proposal, as tests are. Recheck the subject against the **Separate** list.
 5. Report failures unrelated to the proposal. If a check passed only because of other uncommitted changes, say so.
 
 ## Write the commit subject
